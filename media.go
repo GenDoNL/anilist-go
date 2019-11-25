@@ -1,4 +1,4 @@
-package anilist
+package anilistgo
 
 import (
 	"encoding/json"
@@ -123,6 +123,10 @@ const (
 func (a *AniList) Media(s MediaVariables) (m Media, err error) {
 	mPage, err := a.MediaPage(s)
 	if err != nil {
+		return
+	}
+	if len(mPage.Media) == 0 {
+		err = errors.New("no results found")
 		return
 	}
 	m = mPage.Media[0]
