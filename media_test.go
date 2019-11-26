@@ -50,22 +50,22 @@ func TestQueryByID(t *testing.T) {
 	}
 }
 
-////TODO: DEBUG THIS TEST
-//func TestQueryBIDMal(t *testing.T) {
-//	n, err := New()
-//
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	res, err :=  n.Media(MediaSearch{IdMal: 37521})
-//
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	if res.Title.Romaji != "Vinland Saga" {
-//		t.Fatalf("Wrong name was returned when querying by IDMal: %s", res.Title.Romaji)
-//	}
-//}
-//
+//TODO: DEBUG THIS TEST
+func TestQueryBIDMal(t *testing.T) {
+	n, err := New()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	res, err :=  n.Media(MediaVariables{IDMal: 37521, Type: "ANIME"})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if res.Title.Romaji != "Vinland Saga" {
+		t.Fatalf("Wrong name was returned when querying by IDMal: %s", res.Title.Romaji)
+	}
+}
+

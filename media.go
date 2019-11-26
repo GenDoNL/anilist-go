@@ -183,8 +183,8 @@ func createMediaQuery(s MediaVariables) (q MediaQuery, err error) {
 	}
 
 	if s.IDMal != 0 {
-		initVars += "$idmal: Int,"
-		vars += "idMal: $idmal,"
+		initVars += "$idMal: Int,"
+		vars += "idMal: $idMal,"
 	}
 
 	if initVars == "" {
