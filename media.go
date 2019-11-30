@@ -1,39 +1,5 @@
 package anilistgo
 
-import (
-	"encoding/json"
-	"errors"
-	"fmt"
-)
-
-// MediaQuery struct that contains the API query.
-type MediaQuery struct {
-	Query     string         `json:"query"`
-	Variables MediaVariables `json:"variables"`
-}
-
-// MediaVariables for the query type.
-type MediaVariables struct {
-	// Page number you want to acces
-	Page int `json:"page"`
-
-	// PerPage the amount of results shown.
-	PerPage int `json:"perPage"`
-
-	// The ID as defined by AniList
-	ID int `json:"id"`
-
-	// The ID as found on MyAnimeList
-	IDMal int `json:"idMal"`
-
-	// The SearchQuery to find anime as used by the search bar on AniList
-	// Use this to search for anime by name.
-	SearchQuery string `json:"search"`
-
-	// Specify the type of the Anime ("MANGA"/"ANIME")
-	Type string `json:"type"`
-}
-
 // Media is a struct that will contain the data for a Media object.
 // In general, this is either a Manga or an Anime.
 type Media struct {
@@ -68,6 +34,7 @@ type Media struct {
 
 	Favourites int `json:"favourites"`
 
+	Relations MediaConnection `json:"relations"`
 	// Character and staff to be added ?
 
 	// The media's next episode airing schedule
@@ -75,6 +42,26 @@ type Media struct {
 	NextAiringEpisode AiringSchedule `json:"nextAiringEpisode"`
 
 	SiteUrl string `json:"siteUrl"`
+}
+
+type MediaConnection struct {
+	Edges []MediaEdge `json:"edges"`
+	Nodes []Media `json:"nodes"`
+	PageInfo PageInfo `json:"pageInfo"`
+}
+
+type MediaEdge struct {
+	Node Media `json:"node"`
+	Id int `json:"id"`
+	Relation string `json:"relationType"`
+	IsMainStudio bool `json:"isMainStudio"`
+	Characters []Character `json:"characters"`
+	CharacterRole string `json:"characterRole"`
+	StaffRole string `json:"staffRole"`
+	// VoiceActors []Staff `json:"voiceActors"`
+
+	// Authenticated only
+	FavouriteOrder int `json:"favouriteOrder"`
 }
 
 type CoverImage struct {
@@ -110,100 +97,24 @@ type AiringSchedule struct {
 }
 
 const (
-	pageFmtString  = "query (%s) {Page (page: $page, perPage: $perPage) { pageInfo {total currentPage lastPage hasNextPage perPage} %s }  }"
-	mediaFmtString = "media (%s) { id idMal title { romaji english native } " +
+	// This string is everything you can query for a Media object.
+	MediaQueryAll = "{ id idMal title { romaji english native } " +
 		"type format status description startDate { year month day } endDate { year month day } " +
 		"season seasonInt episodes duration chapters volumes countryOfOrigin isLicensed " +
 		"source updatedAt coverImage {extraLarge large medium color} bannerImage genres" +
-		" synonyms averageScore meanScore popularity favourites " +
+		"synonyms averageScore meanScore popularity favourites " +
 		"nextAiringEpisode { timeUntilAiring airingAt } siteUrl } "
 )
 
-// Media returns the first result that is found by the query given the variables.
-func (a *AniList) Media(s MediaVariables) (m Media, err error) {
-	mPage, err := a.MediaPage(s)
-	if err != nil {
-		return
-	}
-	if len(mPage.Media) == 0 {
-		err = errors.New("no results found")
-		return
-	}
-	m = mPage.Media[0]
-	return
-}
-
-// MediaPage retuns a page of the results found by the query given the variables.
-func (a *AniList) MediaPage(s MediaVariables) (p Page, err error) {
-	query, err := createMediaQuery(s)
-
-	res, err := a.Query(query)
-
+// Media returns the Media result that is found by the query and variables.
+func (a *AniList) Media(q string, variables interface{}) (m Media, err error) {
+	data, err := a.Data(q, variables)
 	if err != nil {
 		return
 	}
 
-	var rest Result
-	err = json.Unmarshal(res, &rest)
-
-	p = rest.Data.Page
+	m = data.Media
 	return
 }
 
-func createMediaQuery(s MediaVariables) (q MediaQuery, err error) {
-	var initVars string
-	var vars string
 
-	// Set-up variables for page query
-	page := s.Page
-	if s.Page == 0 {
-		page = 1
-	}
-
-	perPage := s.PerPage
-	if s.PerPage == 0 {
-		perPage = 1
-	}
-	initVars = "$page: Int, $perPage: Int,"
-
-	// Set-up values for media query
-	if s.SearchQuery != "" {
-		initVars += "$search: String,"
-		vars += "search: $search,"
-	}
-
-	if s.Type != "" {
-		initVars += "$type: MediaType,"
-		vars += "type: $type,"
-	}
-
-	if s.ID != 0 {
-		initVars += "$id: Int,"
-		vars += "id: $id,"
-	}
-
-	if s.IDMal != 0 {
-		initVars += "$idMal: Int,"
-		vars += "idMal: $idMal,"
-	}
-
-	if initVars == "" {
-		return q, errors.New("cannot query with empty search")
-	}
-
-	mediaQuery := fmt.Sprintf(mediaFmtString, vars)
-	variables := MediaVariables{
-		Page:    page,
-		PerPage: perPage,
-
-		SearchQuery: s.SearchQuery,
-		Type:        s.Type,
-		ID:          s.ID,
-		IDMal:       s.IDMal,
-	}
-
-	query := fmt.Sprintf(pageFmtString, initVars, mediaQuery)
-
-	q = MediaQuery{query, variables}
-	return
-}

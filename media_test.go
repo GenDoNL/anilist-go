@@ -2,70 +2,40 @@ package anilistgo
 
 import "testing"
 
-func TestFullStack(t *testing.T) {
-	n, err := New()
+func TestAnimeFullStack(t *testing.T) {
+	query := "query ($search: String, $type: MediaType) { Media (search: $search, type: $type) { id idMal title { romaji english native } type genres} }"
 
+	variables := struct {
+		Search string `json:"search"`
+		Type string `json:"type"`
+	}{
+		"Vinland Saga",
+		"ANIME",
+	}
+
+	a, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	res, err := n.Media(MediaVariables{SearchQuery: "Vineland Saga", Type: "ANIME", Page: 1, PerPage: 5})
-	
+	m, err := a.Media(query, variables)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if res.Id != 101348 {
-		t.Fatal("Wrong id was returned.")
+	if m.Id != 101348 {
+		t.Fatalf("Wrong id was returned: %d", m.Id)
 	}
 
-	if res.IdMal != 37521 {
-		t.Fatal("Wrong idMal was returned")
+	if m.IdMal != 37521 {
+		t.Fatalf("Wrong idMal was returned: %d", m.IdMal)
 	}
 
-	if res.Title.Romaji != "Vinland Saga" {
-		t.Fatal("Wrong name was returned.")
+	if m.Title.Romaji != "Vinland Saga" {
+		t.Fatalf("Wrong name was returned: %s", m.Title.Romaji)
 	}
 
-	if len(res.Genres) == 0 {
-		t.Fatal("No genres were returned.")
+	if len(m.Genres) == 0 {
+		t.Fatalf("No genres were returned")
 	}
 }
-
-func TestQueryByID(t *testing.T) {
-	n, err := New()
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	res, err := n.Media(MediaVariables{ID: 101348})
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if res.Title.Romaji != "Vinland Saga" {
-		t.Fatal("Wrong name was returned when querying by ID.")
-	}
-}
-
-//TODO: DEBUG THIS TEST
-func TestQueryBIDMal(t *testing.T) {
-	n, err := New()
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	res, err :=  n.Media(MediaVariables{IDMal: 37521, Type: "ANIME"})
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if res.Title.Romaji != "Vinland Saga" {
-		t.Fatalf("Wrong name was returned when querying by IDMal: %s", res.Title.Romaji)
-	}
-}
-
