@@ -7,12 +7,12 @@ type Media struct {
 	IdMal           int        `json:"idMal"`
 	Title           MediaTitle `json:"title"`
 	Type            string     `json:"type"`
-	Format          string     `json:"mediaFormat"`
-	Status          string     `json:"mediaStatus"`
+	Format          string     `json:"format"`
+	Status          string     `json:"status"`
 	Description     string     `json:"description"`
 	StartDate       FuzzyDate  `json:"startDate"`
 	EndDate         FuzzyDate  `json:"endDate"`
-	Season          string     `json:"mediaSeason"`
+	Season          string     `json:"season"`
 	SeasonInt       int        `json:"seasonInt"`
 	Episodes        int        `json:"episodes"`
 	Duration        int        `json:"duration"`
