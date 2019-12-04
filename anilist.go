@@ -59,7 +59,6 @@ func (a *AniList) structQuery(q interface{}) (d Data, err error) {
 	if err != nil {
 		return
 	}
-	println(string(jsonQ))
 
 	return a.Query(jsonQ)
 }
@@ -75,7 +74,6 @@ func (a *AniList) Query(jsonData []byte) (d Data, err error) {
 	if err != nil {
 		return
 	}
-	println(string(body))
 
 	var res Result
 	err = json.Unmarshal(body, &res)
