@@ -35,6 +35,7 @@ type Data struct {
 	Page Page `json:"Page"`
 
 	Media Media `json:"Media"`
+	User User `json:"User"`
 
 	Character Character `json:"character"`
 }
@@ -56,6 +57,7 @@ func (a *AniList) Data(q string, variables interface{}) (d Data, err error) {
 
 func (a *AniList) structQuery(q interface{}) (d Data, err error) {
 	jsonQ, err := json.Marshal(q)
+
 	if err != nil {
 		return
 	}
