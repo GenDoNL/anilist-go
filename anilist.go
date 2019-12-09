@@ -36,6 +36,7 @@ type Data struct {
 
 	Media Media `json:"Media"`
 	User User `json:"User"`
+	Activity Activity `json:"Activity"`
 
 	Character Character `json:"character"`
 }

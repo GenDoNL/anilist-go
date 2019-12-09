@@ -3,6 +3,10 @@ package anilistgo
 type Page struct {
 	PageInfo PageInfo `json:"pageInfo"`
 	Media []Media `json:"media"`
+	User User `json:"user"`
+	Activity Activity `json:"activities"`
+
+	Character Character `json:"character"`
 }
 
 type PageInfo struct {
