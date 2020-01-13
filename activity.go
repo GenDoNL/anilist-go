@@ -9,7 +9,7 @@ type Activity struct {
 	SiteUrl string `json:"siteUrl"`
 	CreatedAt int `json:"createdAt"`
 
-	User User `json:"User"`
+	User User `json:"user"`
 	Media Media `json:"media"`
 }
 
